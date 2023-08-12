@@ -1,0 +1,32 @@
+{
+  "name": "cdk-ipv6-toy",
+  "version": "0.1.0",
+  "bin": {
+    "cdk-ipv6-toy": "src/CdkApp.js"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "watch": "tsc --watch --noEmit",
+    "cdk-ipv6-toy": "cdk --profile cdk-ipv6-toy",
+    "diff": "npm run cdk-ipv6-toy diff",
+    "list": "npm run cdk-ipv6-toy list",
+    "deploy": "cdk --all --profile cdk-ipv6-toy deploy",
+    "deploy-network": "npm run cdk-ipv6-toy deploy Network",
+    "synth": "npm run cdk-ipv6-toy synth",
+    "deploy-shared-stateless": "npm run cdk-ipv6-toy deploy SharedStateless"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.3",
+    "@types/node": "20.4.5",
+    "jest": "29.6.2",
+    "ts-jest": "29.1.1",
+    "aws-cdk": "2.91.0",
+    "ts-node": "10.9.1",
+    "typescript": "5.1.6"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.91.0",
+    "constructs": "10.2.69",
+    "source-map-support": "^0.5.21"
+  }
+}
