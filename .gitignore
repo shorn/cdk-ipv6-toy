@@ -1,0 +1,17 @@
+
+# IDEA generated files
+.idea
+*.iml
+*.ipr
+# IDEA shouldn't dump a classes dir at the root of the source tree, but
+# it seems to get confused by putting the app generated directory outside the
+# project root (confusion likely derived from generated sources).
+/classes
+
+
+# created by Typescript compilation if misconfigured
+**/ts/**/*.js
+**/ts/**/*.js.map
+
+# see /local/readme.md
+/local

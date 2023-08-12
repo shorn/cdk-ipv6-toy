@@ -1,0 +1,6 @@
+# paranoid redundancy, the dir is already ignored at the root level, but if
+# that file got mis-configured, this would stop people from accidental commits
+*
+
+!readme.md
+!.gitignore
