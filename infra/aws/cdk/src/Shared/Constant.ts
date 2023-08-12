@@ -12,7 +12,3 @@ export const github = {
   owner: 'shorn', repoName: 'cdk-ipv6-toy',
 }
 
-export const vpc = {
-  prodCidr: IpAddresses.cidr("10.10.0.0/16"),
-  testCidr: IpAddresses.cidr("10.20.0.0/16"),
-};

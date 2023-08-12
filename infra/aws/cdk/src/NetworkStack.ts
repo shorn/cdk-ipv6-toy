@@ -1,21 +1,23 @@
-import * as cdk from "aws-cdk-lib";
-import {SubnetType, Vpc} from "aws-cdk-lib/aws-ec2";
+import {ISubnet, SubnetType, Vpc} from "aws-cdk-lib/aws-ec2";
 import {Construct} from "constructs";
-import {vpc} from './Shared/Constant';
+import {Stack, StackProps} from 'aws-cdk-lib';
+import {Ipv6Vpc} from './Shared/IPv6';
 
-export class NetworkStack extends cdk.Stack {
-  readonly rdsSubnetName = 'rds';
-  readonly publicSubnetName = 'public';
-  readonly vpc: Vpc;
+export class NetworkStack extends Stack {
+  readonly availabilityZone: string;
 
-  constructor(scope: Construct, id: string, props?: cdk.StackProps){
+  readonly testVpc: Vpc;
+  readonly testPublicSubnet: ISubnet;
+  readonly testPrivateSubnet: ISubnet;
+  readonly testRdsSubnet: ISubnet;
+
+  constructor(scope: Construct, id: string, props?: StackProps){
     super(scope, id, props);
 
-    this.vpc = new Vpc(this, 'Ipv6ToyTestVpc', {
-      vpcName: "test",
+    this.availabilityZone = this.region + 'a';
 
-      ipAddresses: vpc.testCidr,
-
+    this.testVpc = new Ipv6Vpc(this, 'Ipv6ToyTestVpc', {
+      vpcName: 'test',
 
       natGateways: 0,
 
@@ -28,19 +30,27 @@ export class NetworkStack extends cdk.Stack {
       restrictDefaultSecurityGroup: true,
       createInternetGateway: true,
 
-
       subnetConfiguration: [
         {
-          name: this.publicSubnetName,
+          name: 'public',
           subnetType: SubnetType.PUBLIC,
           mapPublicIpOnLaunch: true,
+
         },
         {
-          name: this.rdsSubnetName,
+          name: 'private',
+          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+        },
+        {
+          name: 'rds',
           subnetType: SubnetType.PRIVATE_ISOLATED,
         },
       ],
     });
+    this.testPublicSubnet = this.testVpc.publicSubnets[0];
+    this.testRdsSubnet = this.testVpc.isolatedSubnets[0];
+    this.testPrivateSubnet = this.testVpc.privateSubnets[0];
 
   }
 }
+
