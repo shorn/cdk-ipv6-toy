@@ -1,4 +1,4 @@
-Everything in this dir gets ignored.
+Everything in this dir gets ignored be default.
 
 It can be used for storing input files, data files, output files, temporary 
 build files or caches, whatever.  
