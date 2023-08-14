@@ -7,9 +7,12 @@ import {AccountServiceStack} from './AccountServiceStack';
 
 const cdkApp = new cdk.App();
 
-new AccountServiceStack(cdkApp, 'AccountService', {});
+const service = new AccountServiceStack(cdkApp, 'AccountService', {});
 
-new NetworkStack(cdkApp, 'Network', {});
 
-new SharedStatelessStack(cdkApp, 'SharedStateless', {});
+const network = new NetworkStack(cdkApp, 'Network', {});
+
+const sharedStateless = new SharedStatelessStack(cdkApp, 'SharedStateless', {
+  vpc: network.testVpc
+});
 

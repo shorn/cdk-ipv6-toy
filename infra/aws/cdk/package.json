@@ -15,7 +15,8 @@
     "deploy-network": "npm run cdk-ipv6-toy deploy Network",
     "destroy-network": "npm run cdk-ipv6-toy destroy Network",
     "synth": "npm run cdk-ipv6-toy synth",
-    "deploy-shared-stateless": "npm run cdk-ipv6-toy deploy SharedStateless"
+    "deploy-shared-stateless": "npm run cdk-ipv6-toy deploy SharedStateless",
+    "destroy-shared-stateless": "npm run cdk-ipv6-toy destroy SharedStateless"
   },
   "devDependencies": {
     "@types/jest": "29.5.3",
