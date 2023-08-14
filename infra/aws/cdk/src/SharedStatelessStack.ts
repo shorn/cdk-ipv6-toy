@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import {Duration} from 'aws-cdk-lib';
+import {Duration, Fn} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {
   ApplicationLoadBalancer,
@@ -9,7 +9,7 @@ import {
   ListenerAction,
   ListenerCondition
 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import {InstanceType, SecurityGroup, Vpc} from 'aws-cdk-lib/aws-ec2';
+import {InstanceType, SecurityGroup, Subnet, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {
   DnsRecordType,
   PublicDnsNamespace
@@ -28,7 +28,7 @@ export class SharedStatelessStack extends cdk.Stack {
   }) {
     super(scope, id, props);
 
-    new TestAlb(this, 'TestAlb', {vpc: props.vpc});
+    // new TestAlb(this, 'TestAlb', {vpc: props.vpc});
 
     // new SecureStringSsmParam(this, "testString", "testString");
   }
@@ -54,14 +54,15 @@ export class TestAlb extends Construct {
       loadBalancerName: 'TestAlb',
       // cdk 2.91.0 - there is only ipv4 or dual-stack
       ipAddressType: IpAddressType.DUAL_STACK,
-      vpc: props.vpc,
       internetFacing: true,
+      vpc: props.vpc,
       vpcSubnets: {
         onePerAz: true,
         /* Not enough IP space available in subnet-xxx.
-         ELB requires at least 8 free IP addresses in each subnet. */
-        // subnets: props.vpc.publicIpv6Subnets,
-        subnets: props.vpc.publicDualSubnets,
+         ELB requires at least 8 free IP addresses in each subnet.
+        subnets: props.vpc.publicIpv6Subnets, */
+        // subnets: props.vpc.publicDualSubnets,
+        subnets: props.vpc.selectNamedSubnets(TestIpV6Vpc.publicDualSubnetName),
       },
       /* partly just avoid an ugly auto-gen name, but also because implicitly
       created SecGroups cause issues with x-stack refs. Because the SecGroup was

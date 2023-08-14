@@ -24,20 +24,18 @@ export class NetworkStack extends Stack {
 }
 
 export class TestIpV6Vpc extends Vpc {
+
   readonly egressOnlyInternetGatewayId: string;
 
   readonly primaryAz: string;
   readonly secondaryAz: string;
 
-  // readonly vpc: Vpc;
-
-  readonly publicDualSubnets: ISubnet[];
-  readonly publicIpv6Subnets: ISubnet[];
-  readonly privateDualSubnets: ISubnet[];
-  readonly privateIpv6Subnets: ISubnet[];
-  readonly isolatedDualSubnets: ISubnet[];
-  readonly isolatedIpv6Subnets: ISubnet[];
-
+  static publicDualSubnetName = 'publicDualStack';
+  static publicIv6SubnetName = 'publicIpv6Only';
+  static privateDualSubnetName = 'privateDualStack';
+  static privateIpv6SubnetName = 'privateIpv6Only';
+  static isolatedDualSubnetName = 'isolatedDualStack';
+  static isolatedIpv6SubnetName = 'isolatedIpv6Only';
 
   readonly cfnVpcCidrBlock: CfnVPCCidrBlock;
 
@@ -45,6 +43,7 @@ export class TestIpV6Vpc extends Vpc {
     super(scope, id, {
       vpcName: 'test',
       natGateways: 0,
+
 
       // wanted to use just one AZ for cost, but an ALB must use two AZ
       availabilityZones: [
@@ -62,29 +61,29 @@ export class TestIpV6Vpc extends Vpc {
 
       subnetConfiguration: [
         {
-          name: 'publicDualStack',
+          name: TestIpV6Vpc.publicDualSubnetName,
           subnetType: SubnetType.PUBLIC,
           mapPublicIpOnLaunch: true,
         },
         {
-          name: 'publicIpv6Only',
+          name: TestIpV6Vpc.publicIv6SubnetName,
           subnetType: SubnetType.PUBLIC,
           mapPublicIpOnLaunch: false,
         },
         {
-          name: 'privateDualStack',
+          name: TestIpV6Vpc.privateDualSubnetName,
           subnetType: SubnetType.PRIVATE_WITH_EGRESS,
         },
         {
-          name: 'privateIpv6Only',
+          name: TestIpV6Vpc.privateIpv6SubnetName,
           subnetType: SubnetType.PRIVATE_WITH_EGRESS,
         },
         {
-          name: 'isolatedDualStack',
+          name: TestIpV6Vpc.isolatedDualSubnetName,
           subnetType: SubnetType.PRIVATE_ISOLATED,
         },
         {
-          name: 'isolatedIpv6Only',
+          name: TestIpV6Vpc.isolatedIpv6SubnetName,
           subnetType: SubnetType.PRIVATE_ISOLATED,
         },
       ],
@@ -93,23 +92,18 @@ export class TestIpV6Vpc extends Vpc {
     this.primaryAz = this.availabilityZones[0];
     this.secondaryAz = this.availabilityZones[1];
 
-    this.publicDualSubnets = this.selectNamedSubnets('publicDualStack');
-    this.publicIpv6Subnets = this.selectNamedSubnets('publicIpv6Only');
-    this.privateDualSubnets = this.selectNamedSubnets('privateDualStack');
-    this.privateIpv6Subnets = this.selectNamedSubnets('privateIpv6Only');
-    this.isolatedDualSubnets = this.selectNamedSubnets('isolatedDualStack');
-    this.isolatedIpv6Subnets = this.selectNamedSubnets('isolatedIpv6Only');
-
-    this.cfnVpcCidrBlock = modifySubnetsForIpv6(this, [
+    // make all the subnets support ipv6
+    this.cfnVpcCidrBlock = modifyForIpv6(this, [
       ...this.publicSubnets,
       ...this.privateSubnets,
       ...this.isolatedSubnets,
     ]);
 
+    // make these ones "ipv6 only"
     modifyForIpv6Only([
-      ...this.publicIpv6Subnets,
-      ...this.privateIpv6Subnets,
-      ...this.isolatedIpv6Subnets,
+      ...this.selectNamedSubnets(TestIpV6Vpc.publicIv6SubnetName),
+      ...this.selectNamedSubnets(TestIpV6Vpc.privateIpv6SubnetName),
+      ...this.selectNamedSubnets(TestIpV6Vpc.isolatedIpv6SubnetName),
     ]);
 
     // for public subnets, create route to the internet gateway
@@ -133,9 +127,12 @@ export class TestIpV6Vpc extends Vpc {
       RouterType.EGRESS_ONLY_INTERNET_GATEWAY
     );
 
+    /* force export the vpc to avoid errors about deleting exports when
+    frobbing resources in other stacks that use the VPC. */
+    Stack.of(this).exportValue(this.vpcId);
   }
 
-  private selectNamedSubnets(subnetGroupName: string){
+  public selectNamedSubnets(subnetGroupName: string){
     return this.selectSubnets({subnetGroupName}).subnets;
   }
 
@@ -145,7 +142,7 @@ export class TestIpV6Vpc extends Vpc {
  * Creates a /54 CIDR, then sequentially allocates one /64 cidr from it for
  * each iven Subnet.
  */
-function modifySubnetsForIpv6(vpc: Vpc, subnets: ISubnet[]): CfnVPCCidrBlock {
+function modifyForIpv6(vpc: Vpc, subnets: ISubnet[]): CfnVPCCidrBlock {
   // associate an IPv6 ::/56 CIDR block with our vpc
   const cfnVpcCidrBlock = new CfnVPCCidrBlock(vpc, "Ipv6Cidr", {
     vpcId: vpc.vpcId,
