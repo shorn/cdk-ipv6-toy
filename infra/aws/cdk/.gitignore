@@ -3,5 +3,10 @@
 node_modules
 
 # CDK asset staging directory
+# CDK init command added this, it contains stuff (like Account ID) you wouldn't
+# want to share publicly, and it's all "temp file" type stuff anyway.
 .cdk.staging
 cdk.out
+
+# do not commit this, it contains the AWS Account ID
+cdk.context.json

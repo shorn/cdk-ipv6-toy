@@ -127,9 +127,15 @@ export class TestIpV6Vpc extends Vpc {
       RouterType.EGRESS_ONLY_INTERNET_GATEWAY
     );
 
-    /* force export the vpc to avoid errors about deleting exports when
-    frobbing resources in other stacks that use the VPC. */
+    /* force export resources to avoid errors about deleting exports when
+    frobbing resources in other stacks that use the VPC (ALBs, EC2 instances) */
     Stack.of(this).exportValue(this.vpcId);
+    Stack.of(this).exportValue(this.vpcCidrBlock);
+    this.selectSubnets().subnets.forEach(iSubnet=>{
+      Stack.of(this).exportValue(iSubnet.subnetId)
+    });
+
+
   }
 
   public selectNamedSubnets(subnetGroupName: string){
