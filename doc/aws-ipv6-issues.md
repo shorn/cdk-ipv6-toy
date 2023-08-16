@@ -72,7 +72,7 @@ SSM Session Manager allows you to connect through to your RDS database via
 a private EC2 instance: https://aws.amazon.com/blogs/database/securely-connect-to-an-amazon-rds-or-amazon-ec2-database-instance-remotely-with-your-preferred-gui/
 
 As far as I can tell, EC2 Instance Connect does not support any similar
-functiona
+functionality.
 
 ### Session Manager does not support IPv6
 
