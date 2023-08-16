@@ -41,7 +41,7 @@ If you create an ALB with one of it's subnets being ipv6-only, you will get:
 
 ### You CANNOT use EC2 Instance Connect with IPv6-only instances
 
-This the "service", rather than the endpoint functionality.
+This is the "service", rather than the endpoint functionality.
 
 >The instance does not have a public IPv4 address
 >To connect using the EC2 Instance Connect browser-based client, the instance must have a public IPv4 address.
