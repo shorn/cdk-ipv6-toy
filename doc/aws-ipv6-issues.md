@@ -6,7 +6,10 @@ not security-first.
 This repo was created out of my desire to research ways to use IPv6 to avoid
 the new IPv4 public address charges.
 
-So you'll
+### The ipv6 support page does not list all services that do not support IPv6
+
+For example, the SSM is not listed on the 
+[VPC IPv6 support page](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html).
 
 
 ### You CANNOT create an ipv6-only vpc
