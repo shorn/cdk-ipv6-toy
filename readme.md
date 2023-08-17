@@ -10,6 +10,7 @@ The AWS CDK source is in [/infra/aws/cdk](/infra/aws/cdk).
 This repo was tested with a clean account created via 
 [AWS Organizations](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html).
 
+
 Credentials for the CDK are 
 [configured via SSO](https://ben11kehoe.medium.com/never-put-aws-temporary-credentials-in-env-vars-or-credentials-files-theres-a-better-way-25ec45b4d73e),
 my SSO user is defined with the`AdministratorAccess` permission set.
@@ -37,8 +38,8 @@ if you want - temporary keys, IAM user keys, whatever floats your boat.
 # CDK configuration
 
 The CDK app is [environment-specific](https://docs.aws.amazon.com/cdk/v2/guide/environments.html),
-but `cdk.context.json` is in `.gitignore` so that my account id is not published
-to github.
+but `cdk.context.json` is in `.gitignore` so that my own AWS Account ID is not 
+published to github.
 
 This means you should be able to deploy the app in your own account and region 
 without having to change anything that might be specific to the region you want 
@@ -47,7 +48,16 @@ to deploy to (AMI IDs are why I had to do this).
 The CDK will just re-populate the `cdk.context.json` with details from your 
 account/region.  Don't commit it if your repo is public - it contains your 
 Account ID (which everybody says isn't a big deal - but Amazon recommends 
-to not publish your Account ID.
+to not share your Account ID).
+
+> While account IDs, like any identifying information, should be used and 
+> shared carefully, they are not considered secret, sensitive, or confidential 
+> information.
+> https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-identifiers.html
+
+At the very least, the Account ID can be used to make spear-phishing attempts 
+look more legitimate (especially to folks like your finance/accounts 
+department).
 
 
 # Stuff I learned about AWS IPv6 support

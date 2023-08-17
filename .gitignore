@@ -15,3 +15,7 @@
 
 # see /local/readme.md
 /local
+
+# do not commit this, it contains the AWS Account ID
+cdk.context.json
+

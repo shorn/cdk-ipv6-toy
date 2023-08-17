@@ -12,15 +12,31 @@ For example, the SSM is not listed on the
 [VPC IPv6 support page](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html).
 
 
-### You CANNOT create an ipv6-only vpc
-
-Looks like there's currently no such thing.
-
-
 ### You CAN create an ipv6-only subnet using CDK
 
 But you have to use [L1 constructs](https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html),
-see [NetworkStack.ts](/infra/aws/cdk/src/NetworkStack.ts)
+see [TestIpV6Vpc.ts](/infra/aws/cdk/src/Test/TestIpV6Vpc.ts)
+
+But they're not much use, since most AWS services don't support IPv6 connections
+so your private subnets will need private IPv4 support and some form of NAT.
+
+You might be able to create an IPv6 only subnet with a bunch of VPC interface 
+endpoints; but those will likely end up costing you similar or more to NAT +
+public IPv4 addresses anyway, so I didn't bother with it.
+
+
+### You CAN create an EC2 instance in an IPv6 subnet without public IPv4
+
+[TestEc2Instance.ts](/infra/aws/cdk/src/Test/TestEc2Instance.ts)
+
+This uses Linux 2023, you can do `sudo dnf update`, `sudo dnf install` and it
+works fine with IPv6.  At least, it's in a dual-stack subnet with no NAT, so it
+seems fine.
+
+
+### You CANNOT create an ipv6-only vpc
+
+Looks like there's currently no such thing.
 
 
 ### You CANNOT create an ALB in a single AZ
@@ -60,7 +76,7 @@ IPv6 addresses:
 https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-using-eice.html#ec2-instance-connect-endpoint-limitations
 
 Note that the endpoint cannot be created via code, so it must create manually:
-[ec2-instance-connect.md](/doc/ec2-instance-connect.md)
+[ec2-instance-connect.md](/doc/ec2-instance-connect-endpoint.md)
 
 So it won't work with instances in ipv6-only subnets, but it does work with
 dual-stack subnets. Meaning you can connect to an instance that has a private 

@@ -1,27 +1,13 @@
 import {
-  CfnEgressOnlyInternetGateway,
-  CfnSubnet,
-  CfnVPCCidrBlock,
-  ISubnet,
-  RouterType,
-  Subnet,
+  CfnEgressOnlyInternetGateway, CfnSubnet,
+  CfnVPCCidrBlock, ISubnet,
+  RouterType, Subnet,
   SubnetType,
   Vpc,
   VpcProps
-} from "aws-cdk-lib/aws-ec2";
-import {Construct} from "constructs";
-import {Fn, Stack, StackProps} from 'aws-cdk-lib';
-
-
-export class NetworkStack extends Stack {
-  readonly testVpc: TestIpV6Vpc;
-
-  constructor(scope: Construct, id: string, props?: StackProps){
-    super(scope, id, props);
-
-    this.testVpc = new TestIpV6Vpc(this, 'TestIpv6');
-  }
-}
+} from 'aws-cdk-lib/aws-ec2';
+import {Construct} from 'constructs';
+import {Fn, Stack} from 'aws-cdk-lib';
 
 export class TestIpV6Vpc extends Vpc {
 
@@ -47,8 +33,8 @@ export class TestIpV6Vpc extends Vpc {
 
       // wanted to use just one AZ for cost, but an ALB must use two AZ
       availabilityZones: [
-        Stack.of(scope).region+"a",
-        Stack.of(scope).region+"b",
+        Stack.of(scope).region + "a",
+        Stack.of(scope).region + "b",
       ],
 
       reservedAzs: 1,
@@ -116,7 +102,7 @@ export class TestIpV6Vpc extends Vpc {
     }
 
     const egressIgw = new CfnEgressOnlyInternetGateway(
-      this, "EgressOnlyIGW", { vpcId: this.vpcId }
+      this, "EgressOnlyIGW", {vpcId: this.vpcId}
     );
     this.egressOnlyInternetGatewayId = egressIgw.ref;
 
@@ -131,14 +117,12 @@ export class TestIpV6Vpc extends Vpc {
     frobbing resources in other stacks that use the VPC (ALBs, EC2 instances) */
     Stack.of(this).exportValue(this.vpcId);
     Stack.of(this).exportValue(this.vpcCidrBlock);
-    this.selectSubnets().subnets.forEach(iSubnet=>{
+    this.selectSubnets().subnets.forEach(iSubnet => {
       Stack.of(this).exportValue(iSubnet.subnetId)
     });
-
-
   }
 
-  public selectNamedSubnets(subnetGroupName: string){
+  public selectNamedSubnets(subnetGroupName: string) {
     return this.selectSubnets({subnetGroupName}).subnets;
   }
 
