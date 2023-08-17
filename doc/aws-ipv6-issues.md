@@ -82,6 +82,7 @@ So it won't work with instances in ipv6-only subnets, but it does work with
 dual-stack subnets. Meaning you can connect to an instance that has a private 
 IPv4 address but no public IPv4 address, therefore no extra cost.
 
+
 ### You CANNOT use EC2 Instance Connect to access your private RDS database
 
 SSM Session Manager allows you to connect through to your RDS database via
@@ -89,6 +90,7 @@ a private EC2 instance: https://aws.amazon.com/blogs/database/securely-connect-t
 
 As far as I can tell, EC2 Instance Connect does not support any similar
 functionality.
+
 
 ### Session Manager does not support IPv6
 
@@ -98,6 +100,13 @@ functionality.
 
 Meaning if want to log in to your instances via Session Manager, you'll need to 
 pay for a a NAT gateway or for the necessary VPC endpoints.  
+
+
+### You CANNOT use "ECS Exec" with IPv6-only instances
+
+[ECS exec](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html)
+is implemented via SSM.  So if you want to get access to your tasks via exec,
+you'll need a public IPv4 address or NAT functionality.
 
 
 ### VPC Endpoints do not support IPv6-only subnets
