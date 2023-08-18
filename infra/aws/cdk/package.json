@@ -10,7 +10,7 @@
     "cdk-ipv6-toy": "cdk --profile cdk-ipv6-toy",
     "diff": "npm run cdk-ipv6-toy diff",
     "list": "npm run cdk-ipv6-toy list",
-    "destroy": "cdk --all --profile cdk-ipv6-toy donot-destroy",
+    "destroy": "cdk --all --profile cdk-ipv6-toy destroy",
     "deploy": "cdk --all --profile cdk-ipv6-toy deploy",
     "deploy-network": "npm run cdk-ipv6-toy deploy Network",
     "destroy-network": "npm run cdk-ipv6-toy destroy Network",

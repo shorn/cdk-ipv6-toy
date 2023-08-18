@@ -1,5 +1,5 @@
 import {
-  CfnEgressOnlyInternetGateway, CfnSubnet,
+  CfnEgressOnlyInternetGateway, CfnEIP, CfnNatGateway, CfnRoute, CfnSubnet,
   CfnVPCCidrBlock, ISubnet,
   RouterType, Subnet,
   SubnetType,
@@ -8,6 +8,7 @@ import {
 } from 'aws-cdk-lib/aws-ec2';
 import {Construct} from 'constructs';
 import {Fn, Stack} from 'aws-cdk-lib';
+import {TestEcs} from './TestEcs';
 
 export class TestIpV6Vpc extends Vpc {
 
@@ -22,6 +23,7 @@ export class TestIpV6Vpc extends Vpc {
   static privateIpv6SubnetName = 'privateIpv6Only';
   static isolatedDualSubnetName = 'isolatedDualStack';
   static isolatedIpv6SubnetName = 'isolatedIpv6Only';
+  static privateDualNatSubnetName = 'privateDualStackNat';
 
   readonly cfnVpcCidrBlock: CfnVPCCidrBlock;
 
@@ -72,6 +74,10 @@ export class TestIpV6Vpc extends Vpc {
           name: TestIpV6Vpc.isolatedIpv6SubnetName,
           subnetType: SubnetType.PRIVATE_ISOLATED,
         },
+        {
+          name: TestIpV6Vpc.privateDualNatSubnetName,
+          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+        },
       ],
     });
 
@@ -113,6 +119,12 @@ export class TestIpV6Vpc extends Vpc {
       RouterType.EGRESS_ONLY_INTERNET_GATEWAY
     );
 
+    addNat(
+      this,
+      this.publicSubnets[0],
+      this.selectNamedSubnets(TestIpV6Vpc.privateDualNatSubnetName)
+    );
+
     /* force export resources to avoid errors about deleting exports when
     frobbing resources in other stacks that use the VPC (ALBs, EC2 instances) */
     Stack.of(this).exportValue(this.vpcId);
@@ -125,6 +137,26 @@ export class TestIpV6Vpc extends Vpc {
   public selectNamedSubnets(subnetGroupName: string) {
     return this.selectSubnets({subnetGroupName}).subnets;
   }
+
+}
+
+function addNat(vpc: Vpc, publicSubnet: ISubnet, privateSubnets: ISubnet[]){
+  const eip = new CfnEIP(vpc, 'NatEIP', {});
+
+  // Add NAT Gateway to the first public subnet
+  const natGateway = new CfnNatGateway(vpc, 'NatGateway', {
+    subnetId: publicSubnet.subnetId,
+    allocationId: eip.attrAllocationId
+  });
+
+  // Add route for the NAT Gateway in all private subnets
+  privateSubnets.forEach( (iSubnet, index) => {
+    new CfnRoute(vpc, `NatRoute${index}`, {
+      routeTableId: iSubnet.routeTable.routeTableId,
+      destinationCidrBlock: '0.0.0.0/0',
+      natGatewayId: natGateway.ref
+    });
+  });
 
 }
 

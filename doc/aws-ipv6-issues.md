@@ -117,3 +117,34 @@ I think they'll work in a dual-stack, but they're expensive - you'd be better
 off just using a NAT gateway.
 
 
+### Dockerhub default endpoints do not support IPv6
+
+https://blog.miyuru.lk/dockerhub-ipv6/
+
+Have to use `registry.ipv6.docker.com`.
+
+
+### GitHub does not support IPv6
+
+https://github.com/orgs/community/discussions/10539
+
+I didn't actually try.
+
+My assumption is that this means you would not be able to run codebuild 
+projects that need to connect to github to pull the source, where that 
+codebuild needs to run in a private subnet (for connectivity to an isolated
+RDS subnet, etc.)
+
+
+### ECS tasks cannot be deployed without IPv4 connectivity
+
+When I tried deploying in the private dual-stack subject (WITHOUT NAT), 
+the task would not transition out of `pending` to `running` - no errors visible.
+Note that this test was running with `registry.ipv6.docker.com` in the image
+specification.
+
+Changing the image to be standard and putting the ASG into the private subnet
+with NAT - the task deployed correctly.
+
+MY assumption is that ECS uses SSM or some other AWS service that needs public 
+IPv4 connectivity.

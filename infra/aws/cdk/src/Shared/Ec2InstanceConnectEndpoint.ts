@@ -23,7 +23,8 @@ export class Ec2InstanceConnectEndpoint extends Construct {
     /* Create a Security Group for the endpoint, remember that you'll need
     to manually delete the VPC endpoint before you can delete this SG.
     CloudFormation just sits waiting for you to detach the SG from endpoint. */
-    this.securityGroup = new SecurityGroup(this, 'InstanceSG', {
+    this.securityGroup = new SecurityGroup(this, 'Ec2Connect', {
+      securityGroupName: "Ec2Connect",
       vpc: props.vpc,
       description: 'Allow SSM traffic',
       allowAllOutbound: true,   // Allow all outbound traffic by default
