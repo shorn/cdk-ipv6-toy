@@ -143,8 +143,8 @@ the task would not transition out of `pending` to `running` - no errors visible.
 Note that this test was running with `registry.ipv6.docker.com` in the image
 specification.
 
-Changing the image to be standard and putting the ASG into the private subnet
-with NAT - the task deployed correctly.
+Changing the image URL to be standard and putting the ASG into the private 
+subnet with NAT - the task deployed correctly.
 
 MY assumption is that ECS uses SSM or some other AWS service that needs public 
-IPv4 connectivity.
+IPv4 connectivity. Possibly ECR, I can't find any doco on ECR connectivity.
