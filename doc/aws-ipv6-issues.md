@@ -16,6 +16,9 @@ mis-understanding.
 For example, the SSM/ECR services are not listed on the 
 [VPC IPv6 support page](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html).
 
+This page does a much better job of making the IPv6 support situation clear:
+https://awsipv6.neveragain.de/
+
 
 ### You CAN create an IPv6-only subnet using CDK
 
