@@ -1,28 +1,35 @@
 As at 2023-08-14.
 
-Note that my personal perspective when researching this stuff is cost-first, 
-not security-first. 
-
 This repo was created out of my desire to research ways to use IPv6 to avoid
 the new IPv4 public address charges.
+So the perspective for the repo and notes below is cost-first;
+security / availability concerns are not considered.
 
-### The ipv6 support page does not list all services that do not support IPv6
+Note that I am not a network engineer - I know very little about IPv6.
+Some of the stuff noted in this repo may just be related to my own fundamental 
+mis-understanding.
 
-For example, the SSM is not listed on the 
+
+
+### The IPv6 support page does not list all services that do not support IPv6
+
+For example, the SSM/ECR services are not listed on the 
 [VPC IPv6 support page](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html).
 
 
-### You CAN create an ipv6-only subnet using CDK
+### You CAN create an IPv6-only subnet using CDK
 
 But you have to use [L1 constructs](https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html),
 see [TestIpV6Vpc.ts](/infra/aws/cdk/src/Test/TestIpV6Vpc.ts)
 
-But they're not much use, since most AWS services don't support IPv6 connections
-so your private subnets will need private IPv4 support and some form of NAT.
+But they're not much use since most AWS services don't support IPv6 connections,
+so your private subnets will need private IPv4 support and some form of NAT or
+direct connectivity.
 
-You might be able to create an IPv6 only subnet with a bunch of VPC interface 
-endpoints; but those will likely end up costing you similar or more to NAT +
-public IPv4 addresses anyway, so I didn't bother with it.
+You might be able to create an IPv6 only subnet suitable for your use-case by 
+creating a bunch of VPC interface endpoints; but those will likely end up 
+costing you similar or more to NAT + public IPv4 addresses anyway, so I didn't 
+bother experimenting with it.
 
 
 ### You CAN create an EC2 instance in an IPv6 subnet without public IPv4
@@ -31,7 +38,7 @@ public IPv4 addresses anyway, so I didn't bother with it.
 
 This uses Linux 2023, you can do `sudo dnf update`, `sudo dnf install` and it
 works fine with IPv6.  At least, it's in a dual-stack subnet with no NAT, so it
-seems fine.
+"seems fine" for this very limited test.
 
 
 ### You CANNOT create an ipv6-only vpc
@@ -42,7 +49,9 @@ Looks like there's currently no such thing.
 ### You CANNOT create an ALB in a single AZ
 
 Not so much an IPv6 thing, as just something I wanted try - to reduce
-ipv4 address costs and inter-AZ network costs
+ipv4 address costs and inter-AZ network costs.  Best you can do is to reduce
+it down to two AZ's, which will cost you two public IPv4 addresses, plus 
+inter-AZ networking costs.
 
 
 ### You CANNOT create an IPv6-only ALB
@@ -57,10 +66,14 @@ If you create an ALB with one of it's subnets being ipv6-only, you will get:
 
 `IPv6 addresses are not supported on t2.micro`
 
+My definition here is what instances were marked "free tier" in the EC2 
+instance creation console wizard.  If the console wizard is out of date, 
+then so is this point.
+
 
 ### You CANNOT use EC2 Instance Connect with IPv6-only instances
 
-This is the "service", rather than the endpoint functionality.
+I'm talking here about the "service", rather than the endpoint functionality.
 
 >The instance does not have a public IPv4 address
 >To connect using the EC2 Instance Connect browser-based client, the instance must have a public IPv4 address.
@@ -98,8 +111,9 @@ functionality.
 > https://docs.aws.amazon.com/whitepapers/latest/ipv6-on-aws/ipv6-security-and-monitoring-considerations.html
 > https://stackoverflow.com/a/61340016/924597
 
-Meaning if want to log in to your instances via Session Manager, you'll need to 
-pay for a a NAT gateway or for the necessary VPC endpoints.  
+Meaning if want to log in to your instances via Session Manager or do other
+maintenance stuff - you'll need to pay for a a NAT gateway or for the 
+necessary VPC endpoints.  
 
 
 ### You CANNOT use "ECS Exec" with IPv6-only instances
@@ -121,7 +135,8 @@ off just using a NAT gateway.
 
 https://blog.miyuru.lk/dockerhub-ipv6/
 
-Have to use `registry.ipv6.docker.com`.
+Have to use `registry.ipv6.docker.com` in your image url, i.e.
+`registry.ipv6.docker.com/nginxdemos/hello:plain-text`
 
 
 ### GitHub does not support IPv6
@@ -147,4 +162,7 @@ Changing the image URL to be standard and putting the ASG into the private
 subnet with NAT - the task deployed correctly.
 
 MY assumption is that ECS uses SSM or some other AWS service that needs public 
-IPv4 connectivity. Possibly ECR, I can't find any doco on ECR connectivity.
+IPv4 connectivity. 
+
+Also, it's probable ECR does'nt support IPv6 either, so you'll run into that
+as an issue as soon as you start trying to do real stuff.
