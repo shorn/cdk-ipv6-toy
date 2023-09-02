@@ -56,10 +56,18 @@ inter-AZ networking costs.
 
 ### You CANNOT create an IPv6-only ALB
 
-If you create an ALB with one of it's subnets being ipv6-only, you will get:
+If you create an ALB with one of it's subnets being IPv6-only, you will get:
 
 > Not enough IP space available in subnet-xxx. 
 > ELB requires at least 8 free IP addresses in each subnet.
+
+Note that the error message generically mentions "IP addresses," without 
+specifically indicating "IPv4 addresses." This is probably indicative of the 
+existing level of IPv6 support in AWS at the time this functionality was 
+written.
+
+The limited IPv6 support in error messages is understandable and not a critique; 
+however, expect it to be a recurring challenge in your setup efforts.
 
 
 ### You CANNOT use the free-tier instance type with IPv6
